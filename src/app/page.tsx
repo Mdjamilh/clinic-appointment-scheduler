@@ -1,103 +1,189 @@
-import Image from "next/image";
+import { ArrowRightIcon, CalendarCheckIcon, CalendarClockIcon, SearchIcon, ShieldCheckIcon } from "lucide-react";
+import Link from "next/link";
 
-export default function Home() {
+import { ProviderAvatar } from "@/components/provider-avatar";
+import { ProviderCard } from "@/components/provider-card";
+import { Button } from "@/components/ui/button";
+import { clinicTimeZoneLabel, formatInClinic, relativeDayLabel } from "@/lib/format";
+import { getNextAppointment, listProviders } from "@/server/queries";
+import { getCurrentUser } from "@/server/session";
+
+const STEPS = [
+  {
+    icon: SearchIcon,
+    title: "Find the right clinician",
+    body: "Search by name or specialty and compare who can see you soonest.",
+  },
+  {
+    icon: CalendarClockIcon,
+    title: "Pick a real open slot",
+    body: "Availability comes straight from provider schedules and updates the moment a slot is taken.",
+  },
+  {
+    icon: ShieldCheckIcon,
+    title: "Manage it in one place",
+    body: "Reschedule or cancel in a click. Your old slot is held until the new one is confirmed.",
+  },
+];
+
+export default async function HomePage() {
+  const [user, providers] = await Promise.all([getCurrentUser(), listProviders()]);
+  const nextVisit = user?.role === "patient" ? await getNextAppointment(user.id) : null;
+
+  const soonest = [...providers]
+    .filter((p) => p.nextAvailable)
+    .sort((a, b) => a.nextAvailable!.getTime() - b.nextAvailable!.getTime())
+    .slice(0, 3);
+  const specialties = [...new Set(providers.map((p) => p.specialty))];
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="space-y-16">
+      <section className="grid items-center gap-10 pt-4 lg:grid-cols-[1.2fr_1fr]">
+        <div>
+          <p className="bg-card text-muted-foreground mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium">
+            <span className="bg-success size-1.5 rounded-full" /> Live availability across {providers.length} providers
+          </p>
+          <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
+            {user ? `Welcome back, ${user.name.split(" ")[0]}.` : "Book a clinic visit in under a minute."}
+          </h1>
+          <p className="text-muted-foreground mt-4 max-w-xl text-lg">
+            See every provider&apos;s real openings, book the time that suits you, and reschedule without phone calls.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Button size="lg" asChild>
+              <Link href="/providers">
+                Find a provider <ArrowRightIcon />
+              </Link>
+            </Button>
+            {user?.role === "patient" && (
+              <Button size="lg" variant="outline" asChild>
+                <Link href="/appointments">My visits</Link>
+              </Button>
+            )}
+            {user?.role === "admin" && (
+              <Button size="lg" variant="outline" asChild>
+                <Link href="/admin">Clinic dashboard</Link>
+              </Button>
+            )}
+            {!user && (
+              <Button size="lg" variant="outline" asChild>
+                <Link href="/sign-in">Try a demo account</Link>
+              </Button>
+            )}
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        <div className="bg-card rounded-2xl border p-6 shadow-sm">
+          {nextVisit ? (
+            <>
+              <p className="text-muted-foreground text-sm font-medium">Your next visit</p>
+              <div className="mt-4 flex items-center gap-4">
+                <ProviderAvatar name={nextVisit.provider.name} />
+                <div>
+                  <p className="font-semibold">{nextVisit.provider.name}</p>
+                  <p className="text-muted-foreground text-sm">{nextVisit.provider.specialty}</p>
+                </div>
+              </div>
+              <div className="bg-primary/5 mt-5 rounded-xl p-4">
+                <p className="text-2xl font-semibold tracking-tight">{relativeDayLabel(nextVisit.startsAt)}</p>
+                <p className="text-muted-foreground">
+                  {formatInClinic(nextVisit.startsAt, "h:mm a")} {clinicTimeZoneLabel(nextVisit.startsAt)} ·{" "}
+                  {nextVisit.provider.location}
+                </p>
+              </div>
+              <p className="mt-4 text-sm">
+                <span className="text-muted-foreground">Reason:</span> {nextVisit.reason}
+              </p>
+              <Button variant="outline" className="mt-5 w-full" asChild>
+                <Link href="/appointments">Manage appointment</Link>
+              </Button>
+            </>
+          ) : (
+            <>
+              <p className="text-muted-foreground text-sm font-medium">Soonest openings</p>
+              <ul className="mt-4 divide-y">
+                {soonest.map((p) => (
+                  <li key={p.id}>
+                    <Link
+                      href={`/providers/${p.slug}`}
+                      className="hover:bg-accent -mx-2 flex items-center gap-3 rounded-lg px-2 py-3 transition-colors"
+                    >
+                      <ProviderAvatar name={p.name} className="size-10" />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-medium">{p.name}</p>
+                        <p className="text-muted-foreground text-sm">{p.specialty}</p>
+                      </div>
+                      <div className="text-right text-sm">
+                        <p className="font-medium">{relativeDayLabel(p.nextAvailable!)}</p>
+                        <p className="text-muted-foreground tabular-nums">
+                          {formatInClinic(p.nextAvailable!, "h:mm a")}
+                        </p>
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+      </section>
+
+      <section aria-labelledby="how-heading">
+        <h2 id="how-heading" className="sr-only">
+          How it works
+        </h2>
+        <div className="grid gap-4 md:grid-cols-3">
+          {STEPS.map((step) => (
+            <div key={step.title} className="bg-card rounded-xl border p-6">
+              <span className="bg-primary/10 text-primary flex size-10 items-center justify-center rounded-lg">
+                <step.icon className="size-5" />
+              </span>
+              <h3 className="mt-4 font-semibold">{step.title}</h3>
+              <p className="text-muted-foreground mt-1 text-sm">{step.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="specialties-heading">
+        <div className="mb-5 flex items-end justify-between gap-4">
+          <div>
+            <h2 id="specialties-heading" className="text-xl font-semibold tracking-tight">
+              Our providers
+            </h2>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {specialties.map((s) => (
+                <Link
+                  key={s}
+                  href={`/providers?specialty=${encodeURIComponent(s)}`}
+                  className="bg-card hover:border-primary/50 hover:text-primary rounded-full border px-3 py-1 text-sm transition-colors"
+                >
+                  {s}
+                </Link>
+              ))}
+            </div>
+          </div>
+          <Button variant="ghost" asChild className="hidden sm:inline-flex">
+            <Link href="/providers">
+              View all <ArrowRightIcon />
+            </Link>
+          </Button>
+        </div>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {providers.slice(0, 3).map((provider) => (
+            <ProviderCard key={provider.id} provider={provider} />
+          ))}
+        </div>
+      </section>
+
+      <section className="bg-primary/5 flex flex-col items-center gap-4 rounded-2xl border px-6 py-10 text-center">
+        <CalendarCheckIcon className="text-primary size-8" />
+        <h2 className="text-xl font-semibold tracking-tight">Ready when you are</h2>
+        <p className="text-muted-foreground max-w-md">Most patients find a slot within the next two days.</p>
+        <Button asChild>
+          <Link href="/providers">Book a visit</Link>
+        </Button>
+      </section>
     </div>
   );
 }
