@@ -21,6 +21,14 @@ const PROVIDERS = [
     slotMinutes: 30,
     bio: "Primary care for the whole family, with a focus on preventive care and chronic condition management.",
     hours: [...weekdays(MON_FRI, h(9), h(12)), ...weekdays(MON_FRI, h(13), h(17))],
+    reasons: [
+      "Annual physical",
+      "Follow-up visit",
+      "Persistent cough",
+      "Medication review",
+      "Lab results review",
+      "Flu-like symptoms",
+    ],
   },
   {
     slug: "james-okafor",
@@ -31,6 +39,13 @@ const PROVIDERS = [
     slotMinutes: 45,
     bio: "Board-certified cardiologist treating hypertension, arrhythmias and post-cardiac-event recovery.",
     hours: weekdays([1, 3, 4], h(8), h(14)),
+    reasons: [
+      "Blood pressure check",
+      "Chest tightness on exertion",
+      "Palpitations",
+      "Post-stent follow-up",
+      "Cholesterol review",
+    ],
   },
   {
     slug: "sofia-ramirez",
@@ -41,6 +56,7 @@ const PROVIDERS = [
     slotMinutes: 30,
     bio: "Well-child visits, vaccinations and sick visits for newborns through teens. Saturday hours available.",
     hours: weekdays([2, 3, 4, 5, 6], h(10), h(16)),
+    reasons: ["Well-child visit", "Vaccinations", "Ear pain", "Fever and sore throat", "Sports physical"],
   },
   {
     slug: "daniel-kim",
@@ -51,6 +67,7 @@ const PROVIDERS = [
     slotMinutes: 20,
     bio: "Medical dermatology including acne, eczema, psoriasis and annual skin cancer screenings.",
     hours: weekdays([1, 2, 4, 5], h(9), h(15)),
+    reasons: ["Skin rash", "Mole check", "Acne follow-up", "Eczema flare", "Annual skin screening"],
   },
   {
     slug: "aisha-rahman",
@@ -61,6 +78,7 @@ const PROVIDERS = [
     slotMinutes: 60,
     bio: "Licensed psychologist offering evidence-based therapy for anxiety, depression and stress.",
     hours: weekdays([1, 2, 3, 4], h(11), h(19)),
+    reasons: ["Initial consultation", "Therapy session", "Trouble sleeping", "Anxiety follow-up", "Stress management"],
   },
   {
     slug: "lucas-bennett",
@@ -71,6 +89,13 @@ const PROVIDERS = [
     slotMinutes: 45,
     bio: "Sports and orthopedic rehabilitation, post-surgical recovery and mobility programs.",
     hours: weekdays(MON_FRI, h(7), h(13)),
+    reasons: [
+      "Knee pain after running",
+      "Post-surgery rehab",
+      "Lower back pain",
+      "Shoulder mobility",
+      "Ankle sprain recovery",
+    ],
   },
 ];
 
@@ -83,27 +108,29 @@ export const DEMO_USERS = [
 
 // Other clinic patients, so the admin view looks like a real clinic day.
 const BACKGROUND_PATIENTS = [
-  "Liam Carter", "Emma Rodriguez", "Oliver Nguyen", "Sophia Brooks", "Elijah Moore", "Isabella Cruz",
-  "Lucas Foster", "Mia Hughes", "Mason Price", "Amelia Ward", "Ethan Kelly", "Harper Diaz",
-  "Logan Reyes", "Evelyn Sanders", "Aiden Ross", "Abigail Perry", "Caleb Long", "Ella Jenkins",
+  "Liam Carter",
+  "Emma Rodriguez",
+  "Oliver Nguyen",
+  "Sophia Brooks",
+  "Elijah Moore",
+  "Isabella Cruz",
+  "Lucas Foster",
+  "Mia Hughes",
+  "Mason Price",
+  "Amelia Ward",
+  "Ethan Kelly",
+  "Harper Diaz",
+  "Logan Reyes",
+  "Evelyn Sanders",
+  "Aiden Ross",
+  "Abigail Perry",
+  "Caleb Long",
+  "Ella Jenkins",
 ].map((name) => ({
   name,
   email: `${name.toLowerCase().replace(" ", ".")}@example.com`,
   role: "patient" as const,
 }));
-
-const REASONS = [
-  "Annual physical",
-  "Follow-up visit",
-  "Persistent cough",
-  "Blood pressure check",
-  "Medication review",
-  "Skin rash",
-  "Knee pain after running",
-  "Routine check-up",
-  "Lab results review",
-  "Trouble sleeping",
-];
 
 /** Small deterministic PRNG so every fresh database looks the same. */
 function mulberry32(seed: number) {
@@ -151,7 +178,7 @@ export async function seed(db: Database, options: SeedOptions = {}) {
     const patientBusy = new Map<string, { start: number; end: number }[]>();
 
     for (const definition of PROVIDERS) {
-      const { hours, ...values } = definition;
+      const { hours, reasons, ...values } = definition;
       const [provider] = await tx.insert(providers).values(values).returning();
       await tx.insert(availabilityRules).values(hours.map((rule) => ({ ...rule, providerId: provider.id })));
 
@@ -181,7 +208,7 @@ export async function seed(db: Database, options: SeedOptions = {}) {
           patientId: patient.id,
           startsAt: slot.startsAt,
           endsAt: slot.endsAt,
-          reason: REASONS[Math.floor(random() * REASONS.length)],
+          reason: reasons[Math.floor(random() * reasons.length)],
           status: cancelled ? "cancelled" : "booked",
           cancelledAt: cancelled ? subDays(slot.startsAt, 2) : null,
           createdAt: subDays(slot.startsAt, 3 + Math.floor(random() * 10)),
