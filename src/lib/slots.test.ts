@@ -23,18 +23,36 @@ describe("generateSlots", () => {
   });
 
   it("drops a trailing partial slot that would overrun the window", () => {
-    const [day] = generateSlots({ rules, slotMinutes: 45, from: new Date("2026-03-02T15:00:00Z"), days: 1, timeZone: TZ });
+    const [day] = generateSlots({
+      rules,
+      slotMinutes: 45,
+      from: new Date("2026-03-02T15:00:00Z"),
+      days: 1,
+      timeZone: TZ,
+    });
     // 9:00, 9:45, 10:30, 11:15 — 12:00 would end at 12:45.
     expect(day.slots).toHaveLength(4);
   });
 
   it("returns empty days when the provider doesn't work", () => {
-    const days = generateSlots({ rules, slotMinutes: 30, from: new Date("2026-03-03T15:00:00Z"), days: 6, timeZone: TZ });
+    const days = generateSlots({
+      rules,
+      slotMinutes: 30,
+      from: new Date("2026-03-03T15:00:00Z"),
+      days: 6,
+      timeZone: TZ,
+    });
     expect(days.map((d) => d.slots.length)).toEqual([0, 0, 0, 0, 0, 0]);
   });
 
   it("keeps local wall-clock times across a daylight-saving change", () => {
-    const days = generateSlots({ rules, slotMinutes: 30, from: new Date("2026-03-02T15:00:00Z"), days: 8, timeZone: TZ });
+    const days = generateSlots({
+      rules,
+      slotMinutes: 30,
+      from: new Date("2026-03-02T15:00:00Z"),
+      days: 8,
+      timeZone: TZ,
+    });
     const before = days[0].slots[0].startsAt; // EST, UTC-5
     const after = days[7].slots[0].startsAt; // EDT, UTC-4
     expect(before.toISOString()).toBe("2026-03-02T14:00:00.000Z");
