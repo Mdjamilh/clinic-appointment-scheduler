@@ -13,7 +13,9 @@
     "format": "prettier --write .",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:seed": "tsx scripts/seed.ts --if-empty"
+    "db:seed": "tsx scripts/seed.mts --if-empty",
+    "test:e2e": "playwright test",
+    "screenshots": "tsx scripts/screenshots.mts"
   },
   "dependencies": {
     "@date-fns/tz": "^1.4.1",
@@ -35,6 +37,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.55.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

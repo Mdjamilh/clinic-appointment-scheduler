@@ -44,3 +44,8 @@ next-env.d.ts
 
 # local embedded database
 .pglite
+
+# playwright
+/test-results/
+/playwright-report/
+/blob-report/
