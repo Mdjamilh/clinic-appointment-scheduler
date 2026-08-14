@@ -1,4 +1,4 @@
-import { CalendarPlusIcon, CalendarXIcon, HistoryIcon } from "lucide-react";
+import { CalendarPlusIcon, CalendarXIcon, FileJsonIcon, HistoryIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -29,7 +29,17 @@ export default async function AppointmentsPage() {
       <PageHeader
         title="My visits"
         description="Manage upcoming appointments and look back at past visits."
-        actions={bookButton}
+        actions={
+          <>
+            <Button variant="outline" asChild>
+              {/* Plain <a>: this is a JSON API response, not a page to client-side navigate to. */}
+              <a href="/api/fhir/Appointment" target="_blank" rel="noopener">
+                <FileJsonIcon /> Export (FHIR)
+              </a>
+            </Button>
+            {bookButton}
+          </>
+        }
       />
 
       <Tabs defaultValue="upcoming">
