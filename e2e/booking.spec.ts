@@ -70,3 +70,21 @@ test("only admins can open the clinic dashboard", async ({ page }) => {
   await expect(page.getByText("Booked today")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Upcoming appointments" })).toBeVisible();
 });
+
+test("the intake helper routes symptoms and flags emergencies", async ({ page }) => {
+  await page.goto("/providers");
+  const box = page.getByRole("textbox", { name: /Describe your symptoms/ });
+  const submit = page.getByRole("button", { name: "Suggest a specialty" });
+
+  // CI runs without an API key, so this exercises the keyword rules.
+  await box.fill("I have an itchy rash on my forearm");
+  await submit.click();
+  await expect(page.getByText("We suggest")).toBeVisible();
+  await page.getByRole("link", { name: "See Dermatology providers" }).click();
+  await expect(page).toHaveURL(/specialty=Dermatology/);
+  await expect(page.getByText("1 provider", { exact: true })).toBeVisible();
+
+  await box.fill("sudden chest pain and shortness of breath");
+  await submit.click();
+  await expect(page.getByRole("alert").filter({ hasText: "This may be an emergency" })).toBeVisible();
+});
