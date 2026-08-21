@@ -2,6 +2,7 @@ import { SearchXIcon } from "lucide-react";
 import type { Metadata } from "next";
 
 import { EmptyState } from "@/components/empty-state";
+import { IntakeAssistant } from "@/components/intake-assistant";
 import { PageHeader } from "@/components/page-header";
 import { ProviderCard } from "@/components/provider-card";
 import { ProviderFilters } from "@/components/provider-filters";
@@ -21,6 +22,7 @@ export default async function ProvidersPage({ searchParams }: Props) {
         title="Find care"
         description="Browse our clinicians, compare availability and pick a time that works for you."
       />
+      <IntakeAssistant />
       <ProviderFilters specialties={specialties} />
       {providers.length === 0 ? (
         <EmptyState
