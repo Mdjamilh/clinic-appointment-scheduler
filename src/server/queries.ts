@@ -12,6 +12,7 @@ import { generateSlots } from "@/lib/slots";
 import { BOOKING_HORIZON_DAYS } from "./appointments";
 
 const NEXT_AVAILABLE_WINDOW_DAYS = 21;
+export const ADMIN_UPCOMING_LIMIT = 12;
 
 async function bookedStarts(providerIds: string[], from: Date, to: Date) {
   if (providerIds.length === 0) return new Map<string, Set<number>>();
@@ -239,7 +240,7 @@ export async function getAdminOverview() {
       ),
       with: { provider: true, patient: true },
       orderBy: asc(appointments.startsAt),
-      limit: 40,
+      limit: ADMIN_UPCOMING_LIMIT,
     }),
     db.query.providers.findMany({ with: { availability: true }, orderBy: asc(providers.name) }),
     db.select({ value: count() }).from(users).where(eq(users.role, "patient")),

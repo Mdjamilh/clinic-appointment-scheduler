@@ -49,7 +49,10 @@ export default async function AdminPage() {
       </section>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <section className="bg-card rounded-xl border p-5 lg:col-span-1" aria-labelledby="utilization-heading">
+        <section
+          className="bg-card rounded-xl border p-5 lg:col-span-1 lg:self-start"
+          aria-labelledby="utilization-heading"
+        >
           <h2 id="utilization-heading" className="font-semibold">
             Today by provider
           </h2>
@@ -83,7 +86,7 @@ export default async function AdminPage() {
           </ul>
         </section>
 
-        <section className="bg-card rounded-xl border lg:col-span-2" aria-labelledby="upcoming-heading">
+        <section className="bg-card overflow-hidden rounded-xl border lg:col-span-2" aria-labelledby="upcoming-heading">
           <div className="p-5 pb-3">
             <h2 id="upcoming-heading" className="font-semibold">
               Upcoming appointments
@@ -134,6 +137,11 @@ export default async function AdminPage() {
                 ))}
               </TableBody>
             </Table>
+          )}
+          {stats.bookedNext7Days > upcoming.length && (
+            <p className="text-muted-foreground border-t px-5 py-3 text-xs">
+              Showing the next {upcoming.length} of {stats.bookedNext7Days} appointments this week.
+            </p>
           )}
         </section>
       </div>
