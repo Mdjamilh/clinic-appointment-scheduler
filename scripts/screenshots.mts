@@ -23,6 +23,11 @@ for (const theme of ["light", "dark"] as const) {
   await shot("home", true);
 
   await page.goto(`${BASE}/providers`);
+  await page
+    .getByRole("textbox", { name: /Describe your symptoms/ })
+    .fill("My knee has been sore for two weeks since I started running");
+  await page.getByRole("button", { name: "Suggest a specialty" }).click();
+  await page.getByText("We suggest").waitFor();
   await shot("providers");
 
   await signIn(page, "Ava Thompson");
