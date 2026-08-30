@@ -14,7 +14,7 @@ async function signIn(page: Page, name: string) {
 }
 
 const browser = await chromium.launch();
-for (const theme of ["light", "dark"] as const) {
+for (const theme of ["dark"] as const) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: theme });
   const page = await context.newPage();
   const shot = (name: string, fullPage = false) => page.screenshot({ path: `${OUT}/${name}-${theme}.png`, fullPage });
@@ -52,10 +52,14 @@ for (const theme of ["light", "dark"] as const) {
   await context.close();
 }
 
-const mobile = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
+const mobile = await browser.newContext({
+  viewport: { width: 390, height: 844 },
+  deviceScaleFactor: 2,
+  colorScheme: "dark",
+});
 const page = await mobile.newPage();
 await page.goto(`${BASE}/providers/maya-patel`);
-await page.screenshot({ path: `${OUT}/schedule-mobile.png` });
+await page.screenshot({ path: `${OUT}/schedule-mobile-dark.png` });
 await mobile.close();
 
 await browser.close();
