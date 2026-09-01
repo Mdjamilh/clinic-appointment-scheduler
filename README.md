@@ -10,7 +10,7 @@ A full-stack scheduling app for an outpatient clinic. Patients find a provider, 
 
 > Portfolio project. All patients and providers are synthetic. Not for clinical use.
 
-![Provider schedule](docs/screenshots/schedule-light.png)
+![Provider schedule](docs/screenshots/schedule-dark.png)
 
 ## Features
 
@@ -30,8 +30,9 @@ A full-stack scheduling app for an outpatient clinic. Patients find a provider, 
 
 | | |
 |---|---|
-| ![Home](docs/screenshots/home-light.png) | ![Find care with intake helper](docs/screenshots/providers-light.png) |
-| ![My visits](docs/screenshots/appointments-light.png) | ![Clinic dashboard (dark)](docs/screenshots/admin-dark.png) |
+| ![Home](docs/screenshots/home-dark.png) | ![Find care with intake helper](docs/screenshots/providers-dark.png) |
+| ![My visits](docs/screenshots/appointments-dark.png) | ![Clinic dashboard](docs/screenshots/admin-dark.png) |
+| ![Booking dialog](docs/screenshots/booking-dialog-dark.png) | ![Mobile schedule](docs/screenshots/schedule-mobile-dark.png) |
 
 ## Tech stack
 
