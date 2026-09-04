@@ -8,6 +8,8 @@
 
 A full-stack scheduling app for an outpatient clinic. Patients find a provider, see real availability, and book, reschedule or cancel visits. Clinic staff get a live dashboard. Appointment data is also available through a **FHIR R4 API**, and an **AI intake helper** suggests the right specialty while catching emergency symptoms first.
 
+**Live demo:** https://clinic-appointment-scheduler-kappa.vercel.app (sign in with any demo account, no password)
+
 > Portfolio project. All patients and providers are synthetic. Not for clinical use.
 
 ![Provider schedule](docs/screenshots/schedule-dark.png)
